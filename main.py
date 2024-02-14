@@ -75,7 +75,7 @@ async def runner(): # めいんのたすく
 
                 if result_cut:
                     result = result[:-1] + ", ...]"
-                result += f" ({input_list[0]})"
+                result += f" ({input_list[0]}d{input_list[1]})"
 
                 if c_count > 0:
                     result += f"\nCritical x{c_count}"
