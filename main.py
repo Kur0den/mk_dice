@@ -3,6 +3,7 @@ import re
 import asyncio
 import json
 from os import environ as env
+from sys import exit
 
 import websockets
 from dotenv import load_dotenv
@@ -86,8 +87,13 @@ async def runner():  # めいんのたすく
                         text = f"@{user_name}@{user_host} {result}"
 
                     mk.notes_create(text=text, reply_id=note_id)  # 結果を返信
-        except websockets.exceptions.ConnectionClosedError:
+        except (
+            websockets.exceptions.ConnectionClosedError,
+            websockets.exceptions.ConnectionClosedOK,
+        ):
             continue
+        except KeyboardInterrupt:
+            exit()
 
 
 print("ready")
