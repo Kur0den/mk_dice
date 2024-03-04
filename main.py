@@ -140,3 +140,4 @@ try:
     asyncio.run(runner())  # runner()を実行
 except (asyncio.exceptions.CancelledError, KeyboardInterrupt):
     pass
+log.info("exit")
