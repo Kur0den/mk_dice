@@ -42,6 +42,7 @@ async def runner():  # めいんのたすく
                         }
                     )
                 )
+                log.info("Websocket (re)connected to main channel")
                 while True:
                     msg = json.loads(await ws.recv())
                     log.info(
