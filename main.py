@@ -86,7 +86,9 @@ async def runner():  # めいんのたすく
                     else:
                         text = f"@{user_name}@{user_host} {result}"
 
-                    mk.notes_create(text=text, reply_id=note_id)  # 結果を返信
+                    await asyncio.to_thread(
+                        mk.notes_create, text=text, reply_id=note_id
+                    )  # 結果を返信
         except (
             websockets.exceptions.ConnectionClosedError,
             websockets.exceptions.ConnectionClosedOK,
@@ -97,4 +99,4 @@ async def runner():  # めいんのたすく
 
 
 print("ready")
-asyncio.get_event_loop().run_until_complete(runner())  # runner()を実行
+asyncio.run(runner())  # runner()を実行
