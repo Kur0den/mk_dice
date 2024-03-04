@@ -35,7 +35,7 @@ async def runner():  # めいんのたすく
                 )
                 while True:
                     msg = json.loads(await ws.recv())
-                    if msg["body"]["type"] == "mention":  # メンション時に反応
+                    if msg["body"].get("type") == "mention":  # メンション時に反応
                         note_id = msg["body"]["body"]["id"]
                         content = msg["body"]["body"]["text"]
                         # 正規表現を作成
