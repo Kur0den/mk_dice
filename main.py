@@ -129,8 +129,13 @@ async def runner():  # めいんのたすく
             websockets.exceptions.ConnectionClosedError,
             websockets.exceptions.ConnectionClosedOK,
         ):
-            # 切断時は1分待って再接続
-            log.warning("Connection closed. Reconnecting in 1 minute...")
+            # 切断時は30秒待って再接続
+            log.warning("Connection closed. Reconnecting in 30 Seconds...")
+            await asyncio.sleep(30)
+            continue
+        except websockets.exceptions.InvalidStatusCode:
+            # ステータスコードがおかしい場合は1分待って再接続
+            log.warning("Invalid status code. Reconnecting in 1 minutes...")
             await asyncio.sleep(60)
             continue
         except KeyboardInterrupt:
