@@ -135,25 +135,26 @@ async def runner():  # めいんのたすくa
             log.warning(
                 "Connection closed. Reconnecting in %s Seconds...", wait_seconds
             )
-            await asyncio.sleep(wait_seconds)
-            if wait_seconds <= 240:
-                wait_seconds = 300
-            else:
-                wait_seconds *= 2
+            wait_seconds = await sleeper(wait_seconds)
             continue
         except websockets.exceptions.InvalidStatusCode:
             # ステータスコードがおかしい場合はwait_seconds分待って再接続
             log.warning(
                 "Invalid status code. Reconnecting in %s minutes...", wait_seconds
             )
-            await asyncio.sleep(wait_seconds)
-            if wait_seconds <= 240:
-                wait_seconds = 300
-            else:
-                wait_seconds *= 2
-            continue
+            wait_seconds = await sleeper(wait_seconds)
+
         except KeyboardInterrupt:
             exit()
+
+
+async def sleeper(wait_seconds: int):
+    await asyncio.sleep(wait_seconds)
+    if wait_seconds <= 240:
+        wait_seconds = 300
+    else:
+        wait_seconds *= 2
+    return wait_seconds
 
 
 log.info("ready")
