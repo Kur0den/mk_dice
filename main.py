@@ -27,7 +27,7 @@ logging.basicConfig(
 log = logging.getLogger("main")
 
 
-async def runner():  # めいんのたすく
+async def runner():  # めいんのたすくa
     while True:
         try:
             async with websockets.connect(ws_url) as ws:  # type: ignore  ##websocketに接続
@@ -43,6 +43,8 @@ async def runner():  # めいんのたすく
                     )
                 )
                 log.info("Websocket (re)connected to main channel")
+                # 接続ができたら待機時間をリセット
+                wait_seconds = 30
                 while True:
                     msg = json.loads(await ws.recv())
                     log.info(
@@ -130,21 +132,38 @@ async def runner():  # めいんのたすく
             websockets.exceptions.ConnectionClosedOK,
         ):
             # 切断時は30秒待って再接続
-            log.warning("Connection closed. Reconnecting in 30 Seconds...")
-            await asyncio.sleep(30)
+            log.warning(
+                "Connection closed. Reconnecting in %s Seconds...", wait_seconds
+            )
+            await asyncio.sleep(wait_seconds)
+            if wait_seconds <= 240:
+                wait_seconds = 300
+            else:
+                wait_seconds *= 2
             continue
         except websockets.exceptions.InvalidStatusCode:
-            # ステータスコードがおかしい場合は1分待って再接続
-            log.warning("Invalid status code. Reconnecting in 1 minutes...")
-            await asyncio.sleep(60)
+            # ステータスコードがおかしい場合はwait_seconds分待って再接続
+            log.warning(
+                "Invalid status code. Reconnecting in %s minutes...", wait_seconds
+            )
+            await asyncio.sleep(wait_seconds)
+            if wait_seconds <= 240:
+                wait_seconds = 300
+            else:
+                wait_seconds *= 2
             continue
         except KeyboardInterrupt:
             exit()
 
 
 log.info("ready")
-try:
-    asyncio.run(runner())  # runner()を実行
-except (asyncio.exceptions.CancelledError, KeyboardInterrupt):
-    pass
+while True:
+    try:
+        asyncio.run(runner())  # runner()を実行
+    except (asyncio.exceptions.CancelledError, KeyboardInterrupt):
+        break
+    except Exception as e:
+        log.error("An error occurred. Retrying...")
+        log.error(e)
+        continue
 log.info("exit")
